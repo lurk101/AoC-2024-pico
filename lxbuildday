@@ -1,4 +1,4 @@
 #!/bin/bash
 cd $1
-echo "g++ -std=c++23 -O3 -I.. $1.cpp"
-g++ -std=c++23 -O3 -I.. $1.cpp
+echo "g++ -std=c++23 -O3 -I../dummy $1.cpp"
+g++ -std=c++23 -O3 -I../dummy $1.cpp

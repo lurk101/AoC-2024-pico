@@ -9,12 +9,14 @@
 using namespace std;
 using namespace chrono;
 
-static vector<string> grid;
+static vector<string> grid = {
+#include "day06.txt"
+};
 static pair<int, int> start;
 static vector<pair<int, int>> dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 static set<pair<int, int>> visited;
 
-static auto isLoop(vector<string>& grid) {
+static auto isLoop(const vector<string>& grid) {
     int dir = 0;
     set<tuple<int, int, int>> visited;
     pair<int, int> cur = start;
@@ -35,17 +37,12 @@ static auto isLoop(vector<string>& grid) {
     return false;
 }
 
-static const vector<string> lines = {
-#include "day06.txt"
-};
-
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
     string line;
     int y = 0;
-    for (const auto& line : lines) {
-        grid.push_back(line);
+    for (const auto& line : grid) {
         for (int x = 0; x < line.size(); x++)
             if (line[x] == '^') start = {y, x};
         y++;

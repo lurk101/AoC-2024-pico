@@ -3,89 +3,69 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 
 using namespace std;
 using namespace chrono;
 
-struct Point {
-    int row, col;
-    auto operator<=>(const Point&) const = default;
-};
+static int maxCol, maxRow{0};
+static map<pair<int, int>, char> ants;
 
-namespace std {
-template <>
-struct hash<Point> {
-    int operator()(const Point& p) const {
-        int h1{int(hash<int>{}(p.row))}, h2{int(hash<int>{}(p.col))};
-        return h1 ^ (h2 << 1);
+static bool inside(const pair<int, int>& p) {
+    return p.first >= 0 && p.first < maxRow && p.second >= 0 && p.second < maxCol;
+}
+
+static int nodes() {
+    set<pair<int, int>> n;
+    for (const auto& [point, kind] : ants) {
+        for (const auto& [other, otherKind] : ants) {
+            if (point == other || kind != otherKind) continue;
+            int dx{other.second - point.second}, dy{other.first - point.first};
+            pair<int, int> p{other.first + dy, other.second + dx};
+            if (inside(p)) n.insert(p);
+        }
     }
-};
-};
+    return int(n.size());
+}
+
+static int harmonics() {
+    set<pair<int, int>> n;
+    for (const auto& [point, kind] : ants) {
+        for (const auto& [other, otherKind] : ants) {
+            if (point == other || kind != otherKind) continue;
+            int dx{other.second - point.second}, dy{other.first - point.first};
+            for (pair<int, int> p{other.first + dy, other.second + dx}; inside(p);
+                 p.first += dy, p.second += dx)
+                n.insert(p);
+            for (pair<int, int> p{other.first - dy, other.second - dx}; inside(p);
+                 p.first -= dy, p.second -= dx)
+                n.insert(p);
+        }
+    }
+    return int(n.size());
+}
 
 static const vector<string> lines = {
 #include "day08.txt"
 };
 
-struct Antennas {
-
-    Antennas() {
-        for (const auto& line : lines) {
-            int col{0};
-            for (const auto& c : line) {
-                if (c != '.') ants.try_emplace({maxRow, col}, c);
-                col++;
-            }
-            maxRow++;
-            maxCol = int(line.size());
-        }
-    }
-
-    bool inside(const Point& p) {
-        return p.row >= 0 && p.row < maxRow && p.col >= 0 && p.col < maxCol;
-    }
-
-    int nodes() {
-        unordered_set<Point> n;
-        for (const auto& [point, kind] : ants) {
-            for (const auto& [other, otherKind] : ants) {
-                if (point == other || kind != otherKind) continue;
-                int dx{other.col - point.col}, dy{other.row - point.row};
-                Point p{other.row + dy, other.col + dx};
-                if (inside(p)) n.insert(p);
-            }
-        }
-        return int(n.size());
-    }
-
-    int harmonics() {
-        unordered_set<Point> n;
-        for (const auto& [point, kind] : ants) {
-            for (const auto& [other, otherKind] : ants) {
-                if (point == other || kind != otherKind) continue;
-                int dx{other.col - point.col}, dy{other.row - point.row};
-                for (Point p{other.row + dy, other.col + dx}; inside(p); p.row += dy, p.col += dx)
-                    n.insert(p);
-                for (Point p{other.row - dy, other.col - dx}; inside(p); p.row -= dy, p.col -= dx)
-                    n.insert(p);
-            }
-        }
-        return int(n.size());
-    }
-
-    int maxCol, maxRow{0};
-    unordered_map<Point, char> ants;
-};
-
 int main() {
-    stdio_init_all();
     auto start = high_resolution_clock::now();
-    Antennas a;
+    ifstream fi("day08.txt");
+    for (const auto& line : lines) {
+        int col{0};
+        for (const auto& c : line) {
+            if (c != '.') ants.try_emplace({maxRow, col}, c);
+            col++;
+        }
+        maxRow++;
+    }
+    maxCol = int(lines[0].size());
     cout << "Day 8: Resonant Collinearity" << endl
-         << "part 1   - " << a.nodes() << endl
-         << "part 2   - " << a.harmonics() << endl
+         << "part 1   - " << nodes() << endl
+         << "part 2   - " << harmonics() << endl
          << "run time - "
          << duration_cast<microseconds>(high_resolution_clock::now() - start).count() / 1e3
          << " ms." << endl;

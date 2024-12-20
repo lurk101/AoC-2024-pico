@@ -8,6 +8,10 @@
 using namespace std;
 using namespace chrono;
 
+static const vector<string> in = {
+#include "day07.txt"
+};
+
 static vector<uint64_t> GetNums(const string& s, char delim) {
     uint64_t pos = 0, posEnd;
     string token;
@@ -51,7 +55,7 @@ static bool Valid(uint64_t i, uint64_t testVal, vector<uint64_t> const& eq, bool
     return false;
 }
 
-static pair<uint64_t, uint64_t> solve(vector<string> const& in) {
+static pair<uint64_t, uint64_t> solve(const vector<string>& in) {
     uint64_t part1(0);
     uint64_t part2(0);
     for (auto const line : in) {
@@ -65,15 +69,9 @@ static pair<uint64_t, uint64_t> solve(vector<string> const& in) {
     }
     return {part1, part2};
 }
-static const vector<string> lines = {
-#include "day07.txt"
-};
-
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    vector<string> in;
-    for (const auto& line : lines) in.push_back(line);
     auto const [p1, p2]{solve(in)};
     cout << "Day 7: Bridge Repair" << endl
          << "part 1   - " << p1 << endl

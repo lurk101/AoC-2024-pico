@@ -38,7 +38,7 @@ static const vector<string> lines = {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    int part1(0), part2(0);
+    int part1 = 0, part2 = 0;
     for (const auto& line : lines) {
         stringstream ssline(line);
         vector<int> levels;

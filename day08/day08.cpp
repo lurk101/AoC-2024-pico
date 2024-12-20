@@ -1,7 +1,6 @@
 #include <pico/stdlib.h>
 
 #include <chrono>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
@@ -52,8 +51,8 @@ static const vector<string> lines = {
 };
 
 int main() {
+    stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day08.txt");
     for (const auto& line : lines) {
         int col{0};
         for (const auto& c : line) {

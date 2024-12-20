@@ -1,0 +1,2 @@
+#!/bin/bash
+for i in $(find -path './day*' -prune -type d | sort); do ./lxrunday ${i%%/}; done

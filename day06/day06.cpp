@@ -77,7 +77,7 @@ int main() {
     cout << "Day 6: Guard Gallivant" << endl
          << "part 1   - " << p1 << endl
          << "part 2   - " << p2 << endl
-         << "Visited time - "
+         << "Run time - "
          << duration_cast<microseconds>(high_resolution_clock::now() - strt).count() / 1e3 << " ms."
          << endl;
 }

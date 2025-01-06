@@ -1,13 +1,16 @@
 #include <pico/stdlib.h>
 
 #include <chrono>
-#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
 using namespace chrono;
+
+static const vector<string> lines = {
+#include "day19.txt"
+};
 
 static vector<string> patterns, designs;
 
@@ -26,48 +29,45 @@ static vector<string> Split(const string& s, const string delim) {
 
 static int Part1() {
     int s = 0;
-    for (string d : designs) {
-        int n = d.size();
-        vector<bool> dp(n + 1, false);
+    for (const string& d : designs) {
+        int n = d.size() + 1;
+        vector<bool> dp(n, false);
         dp[0] = true;
-        for (int i = 1; i <= n; i++)
+        for (int i = 1; i < n; i++)
             for (string p : patterns) {
                 int len = p.size();
                 if (i >= len && d.substr(i - len, len) == p) dp[i] = dp[i] || dp[i - len];
             }
-        if (dp[n]) s++;
+        if (dp[n - 1]) s++;
     }
     return s;
 }
 
 static uint64_t Part2() {
     uint64_t s = 0;
-    for (string d : designs) {
-        int n = d.size();
-        vector<uint64_t> dp(n + 1, 0);
+    for (const string& d : designs) {
+        int n = d.size() + 1;
+        vector<uint64_t> dp(n, 0);
         dp[0] = 1;
-        for (int i = 1; i <= n; i++)
+        for (int i = 1; i < n; i++)
             for (string p : patterns) {
                 int len = p.size();
                 if (i >= len && d.substr(i - len, len) == p) dp[i] += dp[i - len];
             }
-        s += dp[n];
+        s += dp[n - 1];
     }
     return s;
 }
 
-static const vector<string> lines = {
-#include "day19.txt"
-};
-
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    int i = 0;
-    string line = lines[i++];
+    ifstream fi("day19.txt");
+    string line;
+    getline(fi, line);
     patterns = Split(line, ", ");
-    line = lines[i++];
-    while (i < lines.size()) designs.push_back(lines[i++]);
+    getline(fi, line);
+    while (getline(fi, line)) designs.push_back(line);
     cout << "Day 19: Linen Layout" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

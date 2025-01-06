@@ -9,30 +9,43 @@
 using namespace std;
 using namespace chrono;
 
-static vector<string> grid = {
+static const vector<string> lines = {
 #include "day06.txt"
 };
-static pair<int, int> start;
-static vector<pair<int, int>> dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-static set<pair<int, int>> visited;
 
-static auto isLoop(const vector<string>& grid) {
+static int height, width;
+static vector<string> grid;
+
+struct point {
+    int y, x;
+
+    bool operator<(const point& p) const {
+        if (y == p.y) return x < p.x;
+        return y < p.y;
+    }
+
+    point operator+(const point& p) const { return {y + p.y, x + p.x}; }
+
+    bool inside() const { return y >= 0 && y < height && x >= 0 && x < width; }
+};
+
+static point start;
+static vector<point> dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+static set<point> visited;
+
+static auto isLoop(vector<string>& grid) {
     int dir = 0;
     set<tuple<int, int, int>> visited;
-    pair<int, int> cur = start;
-    while (cur.first >= 0 && cur.first < grid.size() && cur.second >= 0 &&
-           cur.second < grid[0].size()) {
-        if (visited.contains({cur.first, cur.second, dir})) return true;
-        visited.insert({cur.first, cur.second, dir});
-        if (cur.first + dirs[dir].first < 0 || cur.first + dirs[dir].first >= grid.size() ||
-            cur.second + dirs[dir].second < 0 || cur.second + dirs[dir].second >= grid[0].size())
-            return false;
-        if (grid[cur.first + dirs[dir].first][cur.second + dirs[dir].second] == '#')
+    point cur = start;
+    while (cur.inside()) {
+        if (visited.contains({cur.y, cur.x, dir})) return true;
+        visited.insert({cur.y, cur.x, dir});
+        auto nxt = cur + dirs[dir];
+        if (!nxt.inside()) return false;
+        if (grid[nxt.y][nxt.x] == '#')
             dir = (dir + 1) % 4;
-        else {
-            cur.first += dirs[dir].first;
-            cur.second += dirs[dir].second;
-        }
+        else
+            cur = cur + dirs[dir];
     }
     return false;
 }
@@ -40,34 +53,31 @@ static auto isLoop(const vector<string>& grid) {
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
+    ifstream fi("day06.txt");
     string line;
-    int y = 0;
-    for (const auto& line : grid) {
+    for (int y = 0; getline(fi, line); y++) {
+        grid.push_back(line);
         for (int x = 0; x < line.size(); x++)
             if (line[x] == '^') start = {y, x};
-        y++;
     }
-    pair<int, int> cur = start;
+    height = grid.size();
+    width = grid[0].size();
+    point cur = start;
     int dir = 0;
-    while (cur.first >= 0 && cur.first < grid.size() && cur.second >= 0 &&
-           cur.second < grid[0].size()) {
+    while (cur.inside()) {
         visited.insert(cur);
-        if (cur.first + dirs[dir].first < 0 || cur.first + dirs[dir].first >= grid.size() ||
-            cur.second + dirs[dir].second < 0 || cur.second + dirs[dir].second >= grid[0].size()) {
-            break;
-        }
-        if (grid[cur.first + dirs[dir].first][cur.second + dirs[dir].second] == '#')
-            dir = (dir + 1) & 3;
-        cur.first += dirs[dir].first;
-        cur.second += dirs[dir].second;
+        auto nxt = cur + dirs[dir];
+        if (!nxt.inside()) break;
+        if (grid[nxt.y][nxt.x] == '#') dir = (dir + 1) & 3;
+        cur = cur + dirs[dir];
     }
     int p1 = 0;
-    for (int i = 0; i < grid.size(); i++)
-        for (int j = 0; j < grid[0].size(); j++)
+    for (int i = 0; i < height; i++)
+        for (int j = 0; j < width; j++)
             if ((grid[i][j] == '.' || grid[i][j] == '^') && visited.contains({i, j})) p1++;
     int p2 = 0;
-    for (int i = 0; i < grid.size(); i++)
-        for (int j = 0; j < grid[0].size(); j++) {
+    for (int i = 0; i < height; i++)
+        for (int j = 0; j < width; j++) {
             if (grid[i][j] == '^' || grid[i][j] == '#') continue;
             if (!visited.contains({i, j})) continue;
             grid[i][j] = '#';
@@ -75,8 +85,8 @@ int main() {
             grid[i][j] = '.';
         }
     cout << "Day 6: Guard Gallivant" << endl
-         << "part 1   - " << p1 << endl
-         << "part 2   - " << p2 << endl
+         << "Part 1   - " << p1 << endl
+         << "Part 2   - " << p2 << endl
          << "Run time - "
          << duration_cast<microseconds>(high_resolution_clock::now() - strt).count() / 1e3 << " ms."
          << endl;

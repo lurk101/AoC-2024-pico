@@ -1,13 +1,16 @@
 #include <pico/stdlib.h>
 
 #include <chrono>
-#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
 using namespace chrono;
+
+static const vector<string> lines = {
+#include "day17.txt"
+};
 
 static uint64_t rA, rB, rC;
 static vector<uint8_t> insts;
@@ -100,34 +103,31 @@ static uint64_t Back(vector<uint8_t> pgm, uint64_t t, uint64_t cur) {
 static string Part1() {
     auto s = Run(rA);
     string r = "";
-    for (int i = 0; i < s.size(); i++) {
-        r += to_string(s[i]);
-        if (i != s.size() - 1) r += ",";
+    for (const auto s1 : s) {
+        if (r.size()) r += ",";
+        r += to_string(s1);
     }
     return r;
 }
 
 static uint64_t Part2() { return Back(insts, insts.size() - 1, 0); }
 
-static const vector<string> lines = {
-#include "day17.txt"
-};
-
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    int i = 0;
-    string line = lines[i++];
+    ifstream fi("day17.txt");
+    string line;
+    getline(fi, line);
     vector<string> parts = Split(line, ' ');
     rA = stoi(parts[2]);
-    line = lines[i++];
+    getline(fi, line);
     parts = Split(line, ' ');
     rB = stoi(parts[2]);
-    line = lines[i++];
+    getline(fi, line);
     parts = Split(line, ' ');
     rC = stoi(parts[2]);
-    line = lines[i++];
-    line = lines[i++];
+    getline(fi, line);
+    getline(fi, line);
     parts = Split(line, ' ');
     output = parts[1];
     parts = Split(parts[1], ',');

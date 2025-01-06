@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <queue>
@@ -11,6 +10,10 @@
 
 using namespace std;
 using namespace chrono;
+
+static const vector<string> lines = {
+#include "day14.txt"
+};
 
 static vector<pair<pair<int, int>, pair<int, int>>> bots;
 
@@ -92,15 +95,12 @@ static int Part2(int maxX, int maxY) {
     }
 }
 
-static const vector<string> lines = {
-#include "day14.txt"
-};
-
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
     ifstream fi("day14.txt");
-    for (const auto& line : lines) {
+    string line;
+    while (getline(fi, line)) {
         int x1, y1, x2, y2;
         sscanf(line.c_str(), "p=%d,%d v=%d,%d", &x1, &y1, &x2, &y2);
         bots.push_back({{x1, y1}, {x2, y2}});

@@ -10,14 +10,16 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> grid = {
+static const vector<string> lines = {
 #include "day12.txt"
 };
+
+static vector<string> grid;
 static set<pair<int, int>> visited;
 
 static void Visit(int y, int x, map<pair<int, int>, int>& spot, int a, char ch) {
-    if ((y < 0 || y >= grid.size() || x < 0 || x >= grid[0].size()) ||
-        (visited.find({y, x}) != visited.end()) || (grid[y][x] != ch))
+    if ((y < 0 || y >= grid.size() || x < 0 || x >= grid[0].size()) || visited.contains({y, x}) ||
+        (grid[y][x] != ch))
         return;
     visited.insert({y, x});
     spot[{y, x}] = a;
@@ -49,7 +51,7 @@ static uint32_t Part1() {
     int a = 1;
     for (int y = 0; y < grid.size(); y++)
         for (int x = 0; x < grid[0].size(); x++)
-            if (visited.find({y, x}) == visited.end()) Visit(y, x, spot, a++, grid[y][x]);
+            if (!visited.contains({y, x})) Visit(y, x, spot, a++, grid[y][x]);
     for (int y = 0; y < grid.size(); y++)
         for (int x = 0; x < grid[0].size(); x++) {
             sizes[spot[{y, x}]].first++;
@@ -74,7 +76,7 @@ static uint32_t Part2() {
     int a = 1;
     for (int y = 0; y < grid.size(); y++)
         for (int x = 0; x < grid[0].size(); x++)
-            if (visited.find({y, x}) == visited.end()) Visit(y, x, spot, a++, grid[y][x]);
+            if (!visited.contains({y, x})) Visit(y, x, spot, a++, grid[y][x]);
     for (int y = 0; y < grid.size(); y++)
         for (int x = 0; x < grid[0].size(); x++) {
             sizes[spot[{y, x}]].first++;
@@ -87,10 +89,13 @@ static uint32_t Part2() {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
+    ifstream fi("day12.txt");
+    string line;
+    while (getline(fi, line)) grid.push_back(line);
     cout << "Day 12: Garden Groups" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl
-         << "run time - "
+         << "Run time - "
          << duration_cast<microseconds>(high_resolution_clock::now() - start).count() / 1e3
          << " ms." << endl;
 }

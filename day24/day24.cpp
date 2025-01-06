@@ -2,110 +2,104 @@
 
 #include <algorithm>
 #include <chrono>
-#include <fstream>
+#include <format>
 #include <iostream>
 #include <map>
+#include <optional>
 #include <set>
-#include <tuple>
 #include <vector>
 
 using namespace std;
 using namespace chrono;
 
-struct instr {
-    string s0, op, s1, d;
+static const vector<string> lines = {
+#include "day24.txt"
 };
 
-static vector<instr> instrs;
-static map<string, uint64_t> wires;
-static vector<string> zWires;
-static vector<pair<string, int>> wireLevels;
+struct gate {
+    string in0, op, in1, out;  // input 0, operator, input 1, output
+};
 
-static vector<string> Split(string s, string delimiter) {
-    size_t pos = 0, posEnd, delimLen = delimiter.length();
-    string token;
-    vector<string> r;
-    while ((posEnd = s.find(delimiter, pos)) != string::npos) {
-        token = s.substr(pos, posEnd - pos);
-        pos = posEnd + delimLen;
-        r.push_back(token);
-    }
-    r.push_back(s.substr(pos));
-    return r;
-}
+static vector<gate> gates;
+static map<string, optional<bool>> wires;
+static vector<string> zWires;
 
 static void Propagate() {
-    bool done = false;
-    while (!done) {
-        for (const auto& [s0, op, s1, d] : instrs) {
-            if (wires[s0] == -1 || wires[s1] == -1) continue;
-            if (op[0] == 'X')
-                wires[d] = wires[s0] ^ wires[s1];
-            else if (op[0] == 'A')
-                wires[d] = wires[s0] & wires[s1];
-            else if (op[0] == 'O')
-                wires[d] = wires[s0] | wires[s1];
+    bool run = true;
+    while (run) {  // repeat till all z wires are resolved
+        for (const auto& [in0, op, in1, d] : gates) {
+            if (!(wires[in0] && wires[in1])) continue;
+            if (op[0] == 'X')  // XOR
+                wires[d] = wires[in0].value() != wires[in1].value();
+            else if (op[0] == 'A')  // AND
+                wires[d] = wires[in0].value() && wires[in1].value();
+            else  // if (op[0] == 'O')  // OR
+                wires[d] = wires[in0].value() || wires[in1].value();
         }
-        done = true;
+        run = false;
         for (const auto wire : zWires)
-            if (wires[wire] == -1) {
-                done = false;
+            if (!wires[wire]) {
+                run = true;
                 break;
             }
     }
 }
 
-static string FindInstr(string a, string oper, string b) {
-    for (const auto& i : instrs)
-        if (i.op == oper)
-            if ((i.s0 == a && i.s1 == b) || (i.s0 == b && i.s1 == a)) return i.d;
+static auto Part1() {
+    sort(zWires.begin(), zWires.end());
+    Propagate();
+    uint64_t r = 0;
+    for (int i = 0; i < zWires.size(); r |= (wires[zWires[i]].value() ? 1LL : 0LL) << i++)
+        ;
+    return r;
+}
+
+static string GateOutWire(const string a, const string oper, const string b) {
+    for (const auto& gate : gates)
+        if (gate.op == oper)
+            if ((gate.in0 == a && gate.in1 == b) || (gate.in0 == b && gate.in1 == a))
+                return gate.out;
     return "";
 }
 
-static void CheckSwap(string& a, string& b, vector<pair<string, string>>& swaps) {
+static vector<pair<string, string>> swaps;
+
+static void TrySwap(string& a, string& b) {
     if (a.size() && a[0] == 'z') {
         swap(a, b);
         swaps.push_back({a, b});
     }
 }
 
-static uint64_t Part1() {
-    sort(zWires.begin(), zWires.end());
-    Propagate();
-    uint64_t r = 0;
-    for (int i = 0; i < zWires.size(); i++) r |= (wires[zWires[i]] << i);
-    return r;
-}
-
-static string Part2() {
-    vector<pair<string, string>> swaps;
-    string in = "";
+static auto Part2() {
+    string In = "";
     for (int ix = 0; ix < 45; ix++) {
-        string nn = (ix < 10) ? "0" + to_string(ix) : to_string(ix);
-        string out = "", InxorSum = "", InandSum = "";
-        string XxorY = FindInstr("x" + nn, "XOR", "y" + nn),
-               XandY = FindInstr("x" + nn, "AND", "y" + nn);
-        if (in.size()) {
-            InandSum = FindInstr(in, "AND", XxorY);
-            InxorSum = FindInstr(in, "XOR", XxorY);
+        string Out = "", InxorSum = "", InandSum = "";
+        const string nn(format("{:02}", ix));
+        string XxorY = GateOutWire("x" + nn, "XOR", "y" + nn);
+        string XandY = GateOutWire("x" + nn, "AND", "y" + nn);
+        if (In.size()) {
+            InandSum = GateOutWire(In, "AND", XxorY);
+            InxorSum = GateOutWire(In, "XOR", XxorY);
             if (InandSum.empty()) {
                 swap(XandY, XxorY);
                 swaps.push_back({XandY, XxorY});
-                InandSum = FindInstr(in, "AND", XxorY);
+                InandSum = GateOutWire(In, "AND", XxorY);
             }
-            CheckSwap(XxorY, InxorSum, swaps);
-            CheckSwap(XandY, InxorSum, swaps);
-            CheckSwap(InandSum, InxorSum, swaps);
-            out = FindInstr(InandSum, "OR", XandY);
+            TrySwap(XxorY, InxorSum);
+            TrySwap(XandY, InxorSum);
+            TrySwap(InandSum, InxorSum);
+            Out = GateOutWire(InandSum, "OR", XandY);
         }
-        if (out.size() && out[0] == 'z' && out != "z45") {
-            swap(out, InxorSum);
-            swaps.push_back({out, InxorSum});
+        if (Out.size() && (Out[0] == 'z') && (Out != "z45")) {
+            swap(Out, InxorSum);
+            swaps.push_back({Out, InxorSum});
         }
-        in = in.empty() ? XandY : out;
+        if (swaps.size() >= 4) break;
+        In = In.empty() ? XandY : Out;
     }
     vector<string> d;
-    for (const auto [a, b] : swaps) {
+    for (const auto& [a, b] : swaps) {
         d.push_back(a);
         d.push_back(b);
     }
@@ -118,39 +112,24 @@ static string Part2() {
     return s;
 }
 
-static const vector<string> lines = {
-#include "day24.txt"
-};
-
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
     ifstream fi("day24.txt");
+    vector<pair<string, bool>> wireLevels;
     string line;
-    int i = 0;
-    for (;;) {
-        string line(lines[i++]);
+    while (getline(fi, line)) {
         if (line == "") break;
-        vector<string> parts = Split(line, ": ");
-        int v = stoi(parts[1]);
-        wires[parts[0]] = v;
-        if (parts[0][0] == 'z') zWires.push_back(parts[0]);
-        wireLevels.push_back({parts[0], v});
+        wireLevels.push_back({line.substr(0, 3), stoi(line.substr(4)) == 1});
     }
-    while (i < lines.size()) {
-        string line(lines[i++]);
-        char s0[8], op[8], s1[8], d[8];
-        sscanf(line.c_str(), "%s %s %s -> %s", s0, op, s1, d);
-        instrs.push_back({string(s0), string(op), string(s1), string(d)});
-        if (d[0] == 'z') zWires.push_back(string(d));
+    string in0;
+    while (fi >> in0) {
+        string op, in1, d;
+        fi >> op >> in1 >> d >> d;
+        gates.push_back({in0, op, in1, d});
+        if (d[0] == 'z') zWires.push_back(d);
     }
-    for (auto z : zWires) wires[z] = -1;
-    for (auto i : instrs) {
-        wires[i.s0] = -1;
-        wires[i.s1] = -1;
-        wires[i.d] = -1;
-    }
-    for (auto i : wireLevels) wires[i.first] = i.second;
+    for (const auto& l : wireLevels) wires[l.first] = l.second;
     cout << "Day 24: Crossed Wires" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

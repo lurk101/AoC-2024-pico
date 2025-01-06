@@ -9,9 +9,13 @@
 using namespace std;
 using namespace chrono;
 
+static const vector<string> lines = {
+#include "day10.txt"
+};
+
 typedef vector<int> point;
 
-set<vector<int>> try1(const vector<string>& grid, int x, int y, int prev_val = -1) {
+static set<vector<int>> try1(vector<string>& grid, int x, int y, int prev_val = -1) {
     set<vector<int>> visited;
     if (!(x >= 0 && x < grid.size()) || !(y >= 0 && y < grid[0].size())) return {{-1, -1}};
     if (grid[x][y] - 48 != prev_val + 1) return {{-1, -1}};
@@ -28,8 +32,8 @@ set<vector<int>> try1(const vector<string>& grid, int x, int y, int prev_val = -
     return visited;
 }
 
-void try2(const vector<string>& grid, int x, int y, set<vector<point>>& out, vector<point> current,
-          int prev_val = -1) {
+static void try2(vector<string>& grid, int x, int y, set<vector<point>>& out, vector<point> current,
+                 int prev_val = -1) {
     if (!(x >= 0 && x < grid.size()) || !(y >= 0 && y < grid[0].size())) return;
     if (grid[x][y] - 48 != prev_val + 1) return;
     if (prev_val == 8) {
@@ -44,13 +48,13 @@ void try2(const vector<string>& grid, int x, int y, set<vector<point>>& out, vec
     try2(grid, x, y + 1, out, current, prev_val + 1);
 }
 
-static const vector<string> grid = {
-#include "day10.txt"
-};
-
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
+    ifstream in("day10.txt");
+    string line;
+    vector<string> grid;
+    while (getline(in, line)) grid.push_back(line);
     int p1{0};
     for (int i = 0; i < grid.size(); i++)
         for (int j = 0; j < grid[i].size(); j++)
@@ -64,9 +68,9 @@ int main() {
                 p2 += int(temp.size());
             }
     cout << "Day 10: Hoof It" << endl
-         << "part 1   - " << p1 << endl
-         << "part 2   - " << p2 << endl
-         << "run time - "
+         << "Part 1   - " << p1 << endl
+         << "Part 2   - " << p2 << endl
+         << "Run time - "
          << duration_cast<microseconds>(high_resolution_clock::now() - start).count() / 1e3
          << " ms." << endl;
 }

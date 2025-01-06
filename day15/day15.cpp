@@ -1,7 +1,6 @@
 #include <pico/stdlib.h>
 
 #include <chrono>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
@@ -10,35 +9,35 @@
 using namespace std;
 using namespace chrono;
 
-struct Point {
+static const vector<string> lines = {
+#include "day15.txt"
+};
+
+struct point {
     int y, x;
-    Point operator+(const Point& p) const { return {y + p.y, x + p.x}; }
-    void operator+=(const Point& p) {
-        y += p.y;
-        x += p.x;
-    }
+    point operator+(const point& p) const { return {y + p.y, x + p.x}; }
 };
 
 static vector<string> grid, saveGrid;
 static string instrs;
-static Point pos;
-static map<char, Point> dirs = {{'^', {-1, 0}}, {'v', {1, 0}}, {'<', {0, -1}}, {'>', {0, 1}}};
+static point pos;
+static map<char, point> dirs = {{'^', {-1, 0}}, {'v', {1, 0}}, {'<', {0, -1}}, {'>', {0, 1}}};
 static map<char, char> oppDir = {{'^', 'v'}, {'v', '^'}, {'<', '>'}, {'>', '<'}};
 
-static void MovBot(char dir, Point& pos) {
-    Point cur = pos + dirs[dir];
-    while (grid[cur.y][cur.x] == 'O') cur += dirs[dir];
+static void MovBot(char dir, point& pos) {
+    point cur = pos + dirs[dir];
+    while (grid[cur.y][cur.x] == 'O') cur = cur + dirs[dir];
     if (grid[cur.y][cur.x] == '#') return;
     while (cur.y != pos.y || cur.x != pos.x) {
-        Point nexPos{cur + dirs[oppDir[dir]]};
+        point nexPos{cur + dirs[oppDir[dir]]};
         swap(grid[cur.y][cur.x], grid[nexPos.y][nexPos.x]);
         cur = nexPos;
     }
-    pos += dirs[dir];
+    pos = pos + dirs[dir];
 }
 
-static bool ChkBox(char dir, Point pos) {
-    Point cur = pos + dirs[dir];
+static bool ChkBox(char dir, point pos) {
+    point cur = pos + dirs[dir];
     if (grid[cur.y][cur.x] == '.') return true;
     if (grid[cur.y][cur.x] == '#') return false;
     if (grid[cur.y][cur.x] == '[')
@@ -48,8 +47,8 @@ static bool ChkBox(char dir, Point pos) {
     return false;
 }
 
-static void MovBox(char dir, Point pos) {
-    Point cur = pos + dirs[dir];
+static void MovBox(char dir, point pos) {
+    point cur = pos + dirs[dir];
     if (grid[cur.y][cur.x] == '.') {
         grid[cur.y][cur.x] = grid[pos.y][pos.x];
         grid[pos.y][pos.x] = '.';
@@ -111,30 +110,24 @@ Found:
     return s;
 }
 
-static const vector<string> lines = {
-#include "day15.txt"
-};
-
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
     ifstream fi("day15.txt");
     string line;
     int i = 0;
-    for (;;) {
-        string line = lines[i];
+    while (getline(fi, line)) {
         if (line.empty()) break;
         grid.push_back(line);
         for (int j = 0; j < line.size(); j++)
             if (line[j] == '@') pos = {i, j};
         ++i;
     }
-    i++;
-    while (i < lines.size()) instrs += lines[i++];
+    while (getline(fi, line)) instrs += line;
     cout << "Day 15: Warehouse Woes" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl
-         << "run time - "
+         << "Run time - "
          << duration_cast<microseconds>(high_resolution_clock::now() - start).count() / 1e3
          << " ms." << endl;
 }

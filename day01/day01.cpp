@@ -1,14 +1,16 @@
+#include <pico/stdlib.h>
+
 #include <algorithm>
 #include <chrono>
 #include <iostream>
-#include <numeric>
-#include <sstream>
 #include <vector>
-
-#include "pico/stdlib.h"
 
 using namespace std;
 using namespace chrono;
+
+static const vector<string> lines = {
+#include "day01.txt"
+};
 
 static int p1(vector<int>& left, vector<int>& right) {
     sort(left.begin(), left.end());
@@ -26,26 +28,20 @@ static int p2(vector<int>& left, vector<int>& right) {
     return space;
 }
 
-static const vector<string> lines = {
-#include "day01.txt"
-};
-
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
     int l, r;
     vector<int> left, right;
-    for (auto& line : lines) {
-        stringstream ss(line);
-        ss >> l >> r;
+    for (const auto& line : lines) {
+        stringstream(line) >> l >> r;
         left.push_back(l);
         right.push_back(r);
     }
-    int s2(p2(left, right));
     cout << "Day 1: Historian Hysteria" << endl
-         << "part 1   - " << p1(left, right) << endl
-         << "part 2   - " << s2 << endl
-         << "run time - "
+         << "Part 1   - " << p1(left, right) << endl
+         << "Part 2   - " << p2(left, right) << endl
+         << "Run time - "
          << duration_cast<microseconds>(high_resolution_clock::now() - start).count() / 1000.0
          << " ms." << endl;
 }

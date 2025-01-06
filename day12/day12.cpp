@@ -10,11 +10,10 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static const vector<string> grid = {
 #include "day12.txt"
 };
 
-static vector<string> grid;
 static set<pair<int, int>> visited;
 
 static void Visit(int y, int x, map<pair<int, int>, int>& spot, int a, char ch) {
@@ -44,8 +43,7 @@ static int Corners(int y, int x, map<pair<int, int>, int>& spot) {
     return s;
 }
 
-static uint32_t Part1() {
-    uint32_t s = 0;
+static auto Part1() {
     map<pair<int, int>, int> spot;
     map<int, pair<int, int>> sizes;
     int a = 1;
@@ -64,13 +62,13 @@ static uint32_t Part1() {
                     sizes[spot[{y, x}]].second++;
             }
         }
+    uint32_t s = 0;
     for (const auto& [_, v] : sizes) s += v.first * v.second;
     return s;
 }
 
-static uint32_t Part2() {
+static auto Part2() {
     visited.clear();
-    uint32_t s = 0;
     map<pair<int, int>, int> spot;
     map<int, pair<int, int>> sizes;
     int a = 1;
@@ -82,6 +80,7 @@ static uint32_t Part2() {
             sizes[spot[{y, x}]].first++;
             sizes[spot[{y, x}]].second += Corners(y, x, spot);
         }
+    uint32_t s = 0;
     for (const auto& [_, v] : sizes) s += v.first * v.second;
     return s;
 }
@@ -89,9 +88,6 @@ static uint32_t Part2() {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day12.txt");
-    string line;
-    while (getline(fi, line)) grid.push_back(line);
     cout << "Day 12: Garden Groups" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

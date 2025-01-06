@@ -8,7 +8,7 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static const vector<string> equations = {
 #include "day07.txt"
 };
 
@@ -55,10 +55,10 @@ static bool Valid(uint64_t i, uint64_t testVal, vector<uint64_t> const& eq, bool
     return false;
 }
 
-static pair<uint64_t, uint64_t> solve(vector<string> const& in) {
+static pair<uint64_t, uint64_t> solve() {
     uint64_t part1(0);
     uint64_t part2(0);
-    for (auto const line : in) {
+    for (auto const line : equations) {
         auto const colon{line.find(':')};
         auto const eq_view{line.substr(colon + 2)};
         auto const eq{GetNums(eq_view, ' ')};
@@ -73,11 +73,8 @@ static pair<uint64_t, uint64_t> solve(vector<string> const& in) {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day07.txt");
     string line;
-    vector<string> equations;
-    while (getline(fi, line)) equations.push_back(line);
-    auto const [p1, p2]{solve(equations)};
+    auto const [p1, p2]{solve()};
     cout << "Day 7: Bridge Repair" << endl
          << "part 1   - " << p1 << endl
          << "part 2   - " << p2 << endl

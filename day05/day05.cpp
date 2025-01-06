@@ -18,13 +18,17 @@ static const vector<string> lines = {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day05.txt");
     string line;
+    int ix = 0;
     unordered_map<int8_t, unordered_set<int8_t>> p;
-    while (getline(fi, line) && (line != ""))
+    while (lines[ix] != "") {
+        const auto& line(lines[ix++]);
         p[stoi(line.substr(0, 2))].insert(stoi(line.substr(3, 2)));
+    }
+    ix++;
     int part1(0), part2(0);
-    while (getline(fi, line)) {
+    while (ix < lines.size()) {
+        const auto& line(lines[ix++]);
         vector<int8_t> ordered;
         for (int i = 0; i < line.length(); i += 3) ordered.push_back(stoi(line.substr(i, 2)));
         auto unOrdered(ordered);

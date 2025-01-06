@@ -38,10 +38,9 @@ static bool safe2(vector<int>& levels) {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day02.txt");
     string line;
     int part1 = 0, part2 = 0;
-    while (getline(fi, line)) {
+    for (const auto& line : lines) {
         stringstream ssline(line);
         vector<int> levels;
         int level;

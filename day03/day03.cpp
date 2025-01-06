@@ -9,11 +9,9 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static const vector<string> memories = {
 #include "day03.txt"
 };
-
-static vector<string> memories;
 
 static int Part1() {
     int count = 0;
@@ -55,9 +53,6 @@ static int Part2() {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day03.txt");
-    string line;
-    while (getline(fi, line)) memories.push_back(line);
     cout << "Day 3: Mull It Over" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

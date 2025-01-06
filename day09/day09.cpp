@@ -9,11 +9,9 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static const string diskmap =
 #include "day09.txt"
-};
-
-static string diskmap;
+    ;
 
 static uint64_t part1() {
     vector<int> blocks;
@@ -94,8 +92,6 @@ static uint64_t part2() {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream file("day09.txt");
-    getline(file, diskmap);
     cout << "Day 9: Disk Fragmenter" << endl
          << "Part 1   - " << part1() << endl
          << "Part 2   - " << part2() << endl

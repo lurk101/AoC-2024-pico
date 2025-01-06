@@ -9,12 +9,11 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static vector<string> grid = {
 #include "day06.txt"
 };
 
 static int height, width;
-static vector<string> grid;
 
 struct point {
     int y, x;
@@ -53,13 +52,13 @@ static auto isLoop(vector<string>& grid) {
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day06.txt");
-    string line;
-    for (int y = 0; getline(fi, line); y++) {
-        grid.push_back(line);
-        for (int x = 0; x < line.size(); x++)
-            if (line[x] == '^') start = {y, x};
-    }
+    for (int y = 0; y < grid.size(); y++)
+        for (int x = 0; x < grid[0].size(); x++)
+            if (grid[y][x] == '^') {
+                start = {y, x};
+                goto found;
+            }
+found:
     height = grid.size();
     width = grid[0].size();
     point cur = start;

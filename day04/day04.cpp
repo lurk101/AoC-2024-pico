@@ -9,11 +9,9 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static const vector<string> m = {
 #include "day04.txt"
 };
-
-static vector<string> m;
 
 static int H(int i, int j, const char* w) {
     return (j <= m.size() - 4) ? (memcmp(&m[i][j], w, 4) == 0 ? 1 : 0) : 0;
@@ -82,9 +80,6 @@ static int Part2() {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day04.txt");
-    string line;
-    while (getline(fi, line)) m.push_back(line);
     cout << "Day 4: Ceres Search" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

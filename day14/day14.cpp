@@ -17,7 +17,7 @@ static const vector<string> lines = {
 
 static vector<pair<pair<int, int>, pair<int, int>>> bots;
 
-static bool hasEgg(const vector<string>& grid) {
+static auto hasEgg(const vector<string>& grid) {
     map<pair<int, int>, bool> visited;
     int maxX = grid[0].size();
     int maxY = grid.size();
@@ -43,7 +43,7 @@ static bool hasEgg(const vector<string>& grid) {
     return false;
 }
 
-static uint64_t Part1(int maxX, int maxY, int time) {
+static auto Part1(int maxX, int maxY, int time) {
     vector<pair<pair<int, int>, pair<int, int>>> r = bots;
     for (int i = 0; i < time; i++)
         for (auto& bot : r) {
@@ -66,7 +66,7 @@ static uint64_t Part1(int maxX, int maxY, int time) {
     return q1 * q2 * q3 * q4;
 }
 
-static int Part2(int maxX, int maxY) {
+static auto Part2(int maxX, int maxY) {
     vector<pair<pair<int, int>, pair<int, int>>> r = bots;
     for (int i = 1;; i++) {
         for (auto& bot : r) {

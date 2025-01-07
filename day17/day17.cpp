@@ -16,7 +16,7 @@ static uint64_t rA, rB, rC;
 static vector<uint8_t> insts;
 static string output;
 
-static vector<string> Split(string s, char delim) {
+static auto Split(string s, char delim) {
     size_t pos = 0, posEnd;
     string token;
     vector<string> r;
@@ -46,7 +46,7 @@ static uint64_t ComboOp(uint8_t op) {
     return -1;
 }
 
-static vector<uint8_t> Run(uint64_t A) {
+static auto Run(uint64_t A) {
     vector<uint8_t> r;
     int ip = 0;
     rA = A;
@@ -100,7 +100,7 @@ static uint64_t Back(vector<uint8_t> pgm, uint64_t t, uint64_t cur) {
     return -1;
 }
 
-static string Part1() {
+static auto Part1() {
     auto s = Run(rA);
     string r = "";
     for (const auto s1 : s) {
@@ -110,27 +110,20 @@ static string Part1() {
     return r;
 }
 
-static uint64_t Part2() { return Back(insts, insts.size() - 1, 0); }
+static auto Part2() { return Back(insts, insts.size() - 1, 0); }
 
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day17.txt");
-    string line;
-    getline(fi, line);
-    vector<string> parts = Split(line, ' ');
+    auto parts = Split(lines[0], ' ');
     rA = stoi(parts[2]);
-    getline(fi, line);
-    parts = Split(line, ' ');
+    parts = Split(lines[1], ' ');
     rB = stoi(parts[2]);
-    getline(fi, line);
-    parts = Split(line, ' ');
+    parts = Split(lines[2], ' ');
     rC = stoi(parts[2]);
-    getline(fi, line);
-    getline(fi, line);
-    parts = Split(line, ' ');
+    parts = Split(lines[4], ' ');
     output = parts[1];
-    parts = Split(parts[1], ',');
+    parts = Split(output, ',');
     for (auto& part : parts) insts.push_back(stoi(part));
     cout << "Day 17: Chronospatial Computer" << endl
          << "Part 1   - " << Part1() << endl

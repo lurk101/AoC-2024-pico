@@ -9,7 +9,7 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static vector<string> grid = {
 #include "day15.txt"
 };
 
@@ -18,13 +18,13 @@ struct point {
     point operator+(const point& p) const { return {y + p.y, x + p.x}; }
 };
 
-static vector<string> grid, saveGrid;
+static vector<string> saveGrid;
 static string instrs;
 static point pos;
 static map<char, point> dirs = {{'^', {-1, 0}}, {'v', {1, 0}}, {'<', {0, -1}}, {'>', {0, 1}}};
 static map<char, char> oppDir = {{'^', 'v'}, {'v', '^'}, {'<', '>'}, {'>', '<'}};
 
-static void MovBot(char dir, point& pos) {
+static auto MovBot(char dir, point& pos) {
     point cur = pos + dirs[dir];
     while (grid[cur.y][cur.x] == 'O') cur = cur + dirs[dir];
     if (grid[cur.y][cur.x] == '#') return;
@@ -36,7 +36,7 @@ static void MovBot(char dir, point& pos) {
     pos = pos + dirs[dir];
 }
 
-static bool ChkBox(char dir, point pos) {
+static auto ChkBox(char dir, point pos) {
     point cur = pos + dirs[dir];
     if (grid[cur.y][cur.x] == '.') return true;
     if (grid[cur.y][cur.x] == '#') return false;
@@ -65,7 +65,7 @@ static void MovBox(char dir, point pos) {
     }
 }
 
-static uint64_t Part1() {
+static auto Part1() {
     saveGrid = grid;
     uint64_t s = 0;
     for (auto instr : instrs) MovBot(instr, pos);
@@ -75,7 +75,7 @@ static uint64_t Part1() {
     return s;
 }
 
-static uint64_t Part2() {
+static auto Part2() {
     grid.clear();
     for (auto line : saveGrid) {
         string row = "";
@@ -113,17 +113,15 @@ Found:
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day15.txt");
-    string line;
     int i = 0;
-    while (getline(fi, line)) {
+    for (;;) {
+        const auto& line(grid[i]);
         if (line.empty()) break;
-        grid.push_back(line);
         for (int j = 0; j < line.size(); j++)
             if (line[j] == '@') pos = {i, j};
         ++i;
     }
-    while (getline(fi, line)) instrs += line;
+    while (i < grid.size()) instrs += grid[i++];
     cout << "Day 15: Warehouse Woes" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

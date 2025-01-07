@@ -48,12 +48,8 @@ static uint64_t Part1(int maxX, int maxY, int time) {
     for (int i = 0; i < time; i++)
         for (auto& bot : r) {
             auto& [pos, vel] = bot;
-            pos.first += vel.first;
-            pos.second += vel.second;
-            pos.first += maxX;
-            pos.second += maxY;
-            pos.first %= maxX;
-            pos.second %= maxY;
+            pos.first = (pos.first + vel.first + maxX) % maxX;
+            pos.second = (pos.second + vel.second + maxY) % maxY;
         }
     int q1 = 0, q2 = 0, q3 = 0, q4 = 0;
     for (auto bot : r) {
@@ -98,9 +94,7 @@ static int Part2(int maxX, int maxY) {
 int main() {
     stdio_init_all();
     auto start = high_resolution_clock::now();
-    ifstream fi("day14.txt");
-    string line;
-    while (getline(fi, line)) {
+    for (const auto& line : lines) {
         int x1, y1, x2, y2;
         sscanf(line.c_str(), "p=%d,%d v=%d,%d", &x1, &y1, &x2, &y2);
         bots.push_back({{x1, y1}, {x2, y2}});

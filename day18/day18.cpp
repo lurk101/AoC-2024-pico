@@ -29,7 +29,7 @@ static auto Part1(int cycles) {
     int dy = finish.y - start.y + 1;
     vector<vector<bool>> grid(dx, vector<bool>(dy, false));
     vector<vector<bool>> visited(dx, vector<bool>(dy, false));
-    vector<vector<int>> dist(dx, vector<int>(dy, 0));
+    vector<vector<int>> distance(dx, vector<int>(dy, 0));
     for (int i = 0; i <= cycles; i++) grid[bytes[i].x][bytes[i].y] = true;
     queue<pair<point, int>> q;
     q.push({start, 0});
@@ -44,27 +44,24 @@ static auto Part1(int cycles) {
                 grid[x][y])
                 continue;
             visited[x][y] = true;
-            dist[x][y] = d + 1;
+            distance[x][y] = d + 1;
             q.push({{x, y}, d + 1});
         }
     }
     if (!visited[finish.x][finish.y]) return -1;
-    return dist[finish.x][finish.y];
+    return distance[finish.x][finish.y];
 }
 
-static string Part2(int start) {
-    int ans = 0;
+static auto Part2(int start) {
     for (int i = start; i < bytes.size(); i++)
         if (Part1(i) == -1) return to_string(bytes[i].x) + "," + to_string(bytes[i].y);
-    return "not found";
+    return string("not found");
 }
 
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day18.txt");
-    string line;
-    while (getline(fi, line)) {
+    for (const auto& line : lines) {
         int x, y;
         sscanf(line.c_str(), "%d,%d", &x, &y);
         bytes.push_back({x, y});

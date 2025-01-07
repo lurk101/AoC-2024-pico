@@ -62,12 +62,11 @@ static uint64_t Part2() {
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day19.txt");
-    string line;
-    getline(fi, line);
+    int ix = 0;
+    string line(lines[ix++]);
     patterns = Split(line, ", ");
-    getline(fi, line);
-    while (getline(fi, line)) designs.push_back(line);
+    ix++;
+    while (ix < lines.size()) designs.push_back(lines[ix++]);
     cout << "Day 19: Linen Layout" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

@@ -12,7 +12,7 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static const vector<string> grid = {
 #include "day16.txt"
 };
 
@@ -24,7 +24,6 @@ struct point {
     }
 };
 
-vector<string> grid;
 static vector<point> dirs = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 static point start, finish;
 static map<tuple<int, int, int>, vector<tuple<int, int, int>>> previous;
@@ -78,18 +77,12 @@ static uint64_t Part2() {
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day16.txt");
-    string line;
-    int y = 0;
-    while (getline(fi, line)) {
-        grid.push_back(line);
-        for (int x = 0; x < line.size(); x++)
-            if (line[x] == 'S')
+    for (int y = 0; y < grid.size(); y++)
+        for (int x = 0; x < grid[0].size(); x++)
+            if (grid[y][x] == 'S')
                 start = {y, x};
-            else if (line[x] == 'E')
+            else if (grid[y][x] == 'E')
                 finish = {y, x};
-        ++y;
-    }
     cout << "Day 16: Reindeer Maze" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

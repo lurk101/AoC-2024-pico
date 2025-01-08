@@ -81,9 +81,7 @@ static auto Part2() {
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day23.txt");
-    string line;
-    while (getline(fi, line)) {
+    for (const auto& line : lines) {
         auto p0 = line.substr(0, 2), p1 = line.substr(3);
         c.insert(p0);
         c.insert(p1);

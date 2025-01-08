@@ -53,9 +53,7 @@ static auto Part2() {
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day22.txt");
-    string line;
-    while (getline(fi, line)) secrets.push_back(stoul(line));
+    for (const auto& line : lines) secrets.push_back(stoul(line));
     cout << "Day 22: Monkey Market" << endl
          << "Part 1   - " << Part1() << endl
          << "Part 2   - " << Part2() << endl

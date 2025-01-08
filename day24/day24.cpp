@@ -7,6 +7,7 @@
 #include <map>
 #include <optional>
 #include <set>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -115,17 +116,16 @@ static auto Part2() {
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day24.txt");
     vector<pair<string, bool>> wireLevels;
-    string line;
-    while (getline(fi, line)) {
-        if (line == "") break;
+    int ix = 0;
+    for (;;) {
+        const auto& line(lines[ix++]);
+        if (line.empty()) break;
         wireLevels.push_back({line.substr(0, 3), stoi(line.substr(4)) == 1});
     }
-    string in0;
-    while (fi >> in0) {
-        string op, in1, d;
-        fi >> op >> in1 >> d >> d;
+    string in0, op, in1, d;
+    while (ix < lines.size()) {
+        stringstream(lines[ix++]) >> in0 >> op >> in1 >> d >> d;
         gates.push_back({in0, op, in1, d});
         if (d[0] == 'z') zWires.push_back(d);
     }

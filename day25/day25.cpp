@@ -19,11 +19,9 @@ static vector<uint32_t> keys, locks;
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day25.txt");
-    string line;
     int y = 0;
     uint32_t keyOrLock = 0;
-    while (getline(fi, line)) {
+    for (const auto& line : lines) {
         if (line.empty()) {
             y = 0;
             keyOrLock = 0;

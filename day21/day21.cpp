@@ -11,13 +11,12 @@
 using namespace std;
 using namespace chrono;
 
-static const vector<string> lines = {
+static const vector<string> codes = {
 #include "day21.txt"
 };
 
 typedef tuple<int8_t, int8_t, int8_t, int8_t, int8_t> key;
 
-static vector<string> codes;
 static map<key, int64_t> memo;
 
 static int64_t BestDirKey(const string& buttons, int nBots);
@@ -122,9 +121,6 @@ static uint64_t Solve(int nBots) {
 int main() {
     stdio_init_all();
     auto strt = high_resolution_clock::now();
-    ifstream fi("day21.txt");
-    string line;
-    while (getline(fi, line)) codes.push_back(line);
     cout << "Day 21: Keypad Conundrum" << endl
          << "Part 1   - " << Solve(3) << endl
          << "Part 2   - " << Solve(26) << endl

@@ -1,11 +1,12 @@
 /*  Advent of Code 2024 Day 16 Reindeer Maze
     Written 2025 by Eric Olson */
 
-#include <limits.h>
 #include <pico/stdlib.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include <climits>
+#include <iostream>
+
+using namespace std;
 
 static uint32_t tic_start;
 
@@ -19,35 +20,29 @@ static double toc() { return (time_us_32() - tic_start) / 1e6; }
 
 static const int dirs[4][2] = {{0, 1}, {-1, 0}, {0, -1}, {1, 0}};
 
-static int isvertex(int i, int j) {
-    if (maze[i][j] == 'S') return 1;
-    if (maze[i][j] == 'E') return 1;
-    if (maze[i][j] == '#') return 0;
+static bool isvertex(int i, int j) {
+    auto c = maze[i][j];
+    if ((c == 'S') || (c == 'E')) return true;
+    if (c == '#') return false;
     int r = 0;
     for (char d = 0; d < 4; d++) {
         int di = dirs[d][0], dj = dirs[d][1];
         if (maze[i + di][j + dj] != '#') r++;
     }
-    if (r != 2) return 1;
-    return 0;
+    return r != 2;
 }
 
 static void vcount(int* pm, int* pstart, int* pstop) {
-    int m = 0;
-    int start, stop;
+    *pm = 0;
     for (int i = 0; i < 141; i++)
         for (int j = 0; j < 141; j++)
             if (isvertex(i, j)) {
                 if (maze[i][j] == 'S')
-                    start = m;
+                    *pstart = *pm;
                 else if (maze[i][j] == 'E')
-                    stop = m;
-                m++;
+                    *pstop = *pm;
+                (*pm)++;
             }
-    *pm = m;
-    *pstart = start;
-    *pstop = stop;
-    return;
 }
 
 static void ntoij(int* pi, int* pj, int n) {
@@ -62,8 +57,6 @@ static void ntoij(int* pi, int* pj, int n) {
                 }
                 m++;
             }
-    printf("Tried to retrieve %d of %d vertices!\n", n, m);
-    exit(1);
 }
 
 static int ijton(int hi, int hj) {
@@ -74,20 +67,18 @@ static int ijton(int hi, int hj) {
                 if (i == hi && j == hj) return m;
                 m++;
             }
-    printf("Tried to retrieve (%d,%d) but not a vertice!\n", hi, hj);
-    exit(1);
+    return 0;  // shouldn't happen
 }
 
 typedef struct {
-    int w[4], e[4];
-    char de[4];
+    int w[4] = {}, e[4] = {};
+    char de[4] = {};
 } vertspec;
 
 static char dijtod(int di, int dj) {
     for (int d = 0; d < 4; d++)
         if (dirs[d][0] == di && dirs[d][1] == dj) return d;
-    printf("Unknown direction (%d,%d)\n", di, dj);
-    exit(1);
+    return 0;  // shouldn't happen
 }
 
 static int follow(int* pn, char* pd, int i, int j, int di, int dj) {
@@ -180,7 +171,6 @@ static void mkpath(int n, int pn[][4], vertspec vn[], int start) {
             }
         }
     }
-    return;
 }
 
 static void parts(int* pp1, int* pp2, int n, vertspec vn[], int pn[][4], int stop) {
@@ -193,9 +183,17 @@ static void parts(int* pp1, int* pp2, int n, vertspec vn[], int pn[][4], int sto
         }
     }
     char sni[n][4], sno[n][4], cv[n];
-    bzero(sni, n * 4 * sizeof(char));
-    bzero(sno, n * 4 * sizeof(char));
-    bzero(cv, n * sizeof(char));
+    for (int i = 0; i < n; i++) {
+        cv[i] = 0;
+        sni[i][0] = 0;
+        sni[i][1] = 0;
+        sni[i][2] = 0;
+        sni[i][3] = 0;
+        sno[i][0] = 0;
+        sno[i][1] = 0;
+        sno[i][2] = 0;
+        sno[i][3] = 0;
+    }
     sni[stop][dmin] = 1;
     cv[stop] = 1;
     int p2 = 0;
@@ -237,23 +235,21 @@ static void parts(int* pp1, int* pp2, int n, vertspec vn[], int pn[][4], int sto
         if (cv[i]) p2++;
     *pp1 = p1;
     *pp2 = p2;
-    return;
 }
 
 int main() {
     stdio_init_all();
-    printf("Advent of Code 2024 Day 16 Reindeer Maze\n\n");
+    cout << "Advent of Code 2024 Day 16 Reindeer Maze" << endl << endl;
     tic();
     int n, start, stop;
     vcount(&n, &start, &stop);
     vertspec vn[n];
-    bzero(vn, sizeof(vertspec) * n);
     mkgraph(n, vn);
     int pn[n][4];
     mkpath(n, pn, vn, start);
     int p1, p2;
     parts(&p1, &p2, n, vn, pn, stop);
-    printf("Part 1 The lowest score a Reindeer could get is %d\n", p1);
-    printf("Part 2 The best viewing paths consist of %d tiles\n", p2);
-    printf("\nTotal execution time %g seconds.\n", toc());
+    cout << "Part 1 The lowest score a Reindeer could get is " << p1 << endl;
+    cout << "Part 2 The best viewing paths consist of " << p2 << " tiles" << endl;
+    cout << endl << "Total execution time " << toc() << " seconds." << endl;
 }

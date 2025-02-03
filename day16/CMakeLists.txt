@@ -11,7 +11,7 @@ project(day16 C CXX ASM)
 
 pico_sdk_init()
 
-add_executable(day16 day16.c)
+add_executable(day16 day16.cpp)
 
 pico_set_program_name(day16 "day16")
 
